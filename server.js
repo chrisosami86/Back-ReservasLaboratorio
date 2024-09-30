@@ -68,13 +68,18 @@ app.post('/validate-intervals', async (req, res) => {
 
         // Revisar los eventos para encontrar intervalos ocupados
         events.data.items.forEach((event) => {
-            const eventStart = new Date(event.start.dateTime).toISOString().slice(11, 16);
-            const eventEnd = new Date(event.end.dateTime).toISOString().slice(11, 16);
+            const eventStart = new Date(event.start.dateTime);
+            const eventEnd = new Date(event.end.dateTime);
 
             // Verificar superposición con cada intervalo
-            Object.values(timeIntervals).forEach((interval) => {  // Uso de Object.values()
+            Object.values(timeIntervals).forEach((interval) => {
+                // Crear objetos Date para los intervalos del día seleccionado
+                const intervalStart = new Date(`${selectedDate}T${interval.start}:00`);
+                const intervalEnd = new Date(`${selectedDate}T${interval.end}:00`);
+
+                // Verificar superposición (eventStart < intervalEnd && eventEnd > intervalStart)
                 if (
-                    (eventStart < interval.end && eventEnd > interval.start)
+                    eventStart < intervalEnd && eventEnd > intervalStart
                 ) {
                     occupiedIntervals.push(interval);
                 }
@@ -86,8 +91,12 @@ app.post('/validate-intervals', async (req, res) => {
 
         // Filtrar los intervalos disponibles y añadir ID
         const availableIntervals = Object.entries(timeIntervals).filter(([id, interval]) => {
+            const intervalStart = new Date(`${selectedDate}T${interval.start}:00`);
+            const intervalEnd = new Date(`${selectedDate}T${interval.end}:00`);
+
             return !uniqueOccupiedIntervals.some(occupied => 
-                occupied.start === interval.start && occupied.end === interval.end
+                intervalStart.getTime() === new Date(`${selectedDate}T${occupied.start}:00`).getTime() &&
+                intervalEnd.getTime() === new Date(`${selectedDate}T${occupied.end}:00`).getTime()
             );
         }).map(([id, interval]) => ({ id, ...interval })); // Añadir ID a cada intervalo
 
@@ -97,6 +106,7 @@ app.post('/validate-intervals', async (req, res) => {
         res.status(500).json({ error: 'Error al validar intervalos.' });
     }
 });
+
 
 
 // Endpoint para registrar un evento en el calendario y en la hoja de cálculo
