@@ -45,8 +45,10 @@ const timeIntervalsArray = Object.keys(timeIntervals).map(key => ({
 
 // Función para convertir intervalos a un formato compatible con Calendar
 function convertToISODate(date, time) {
-    return new Date(`${date}T${time}:00`).toISOString();
+    // Agregar zona horaria manualmente (Bogotá está en UTC-5)
+    return new Date(`${date}T${time}:00-05:00`).toISOString();
 }
+
 
 app.post('/validate-intervals', async (req, res) => {
     try {
