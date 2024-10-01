@@ -114,7 +114,8 @@ app.post('/validate-intervals', async (req, res) => {
 // Endpoint para registrar un evento en el calendario y en la hoja de cálculo
 app.post('/register-reservation', async (req, res) => {
     try {
-        const { teacherName, subject, reservationDate, timeSlotId, observations } = req.body; // Añadir observaciones
+        // Extraer currentDatetime junto con los demás campos del body
+        const { currentDatetime, teacherName, program, subject, reservationDate, timeSlotId, observations } = req.body;
 
         // Obtener el intervalo de tiempo basado en el ID
         const selectedInterval = timeIntervals[timeSlotId];
@@ -123,9 +124,9 @@ app.post('/register-reservation', async (req, res) => {
             return res.status(400).json({ error: 'Intervalo de tiempo no válido.' });
         }
 
-        // Crear el evento en Google Calendar
+        // Crear el evento en Google Calendar (sin cambios aquí)
         const event = {
-            summary: `${teacherName} - ${subject}`,
+            summary: `${teacherName} - ${subject} (${program})`,
             start: {
                 dateTime: convertToISODate(reservationDate, selectedInterval.start),
                 timeZone: 'America/Bogota',
@@ -136,35 +137,40 @@ app.post('/register-reservation', async (req, res) => {
             },
         };
 
-        // Insertar el evento en Google Calendar
         await calendar.events.insert({
             calendarId,
             resource: event,
         });
 
-        // Registrar los datos en Google Sheets
-        const newRow = [
-            new Date().toISOString(),
-            teacherName,
-            subject,
-            reservationDate,
-            `${selectedInterval.start} - ${selectedInterval.end}`,
-            observations, // Añadir observaciones
+        // Registrar los detalles en Google Sheets, incluyendo currentDatetime
+        const rowData = [
+            currentDatetime,       // Fecha y hora actuales (nuevo campo)
+            teacherName,           // Nombre del profesor
+            program,               // Programa
+            subject,               // Asignatura
+            reservationDate,        // Fecha de reserva
+            `${selectedInterval.start} - ${selectedInterval.end}`, // Intervalo de tiempo
+            observations         // Observaciones                
         ];
 
         await sheets.spreadsheets.values.append({
             spreadsheetId: sheetId,
-            range: 'A:F', // Aumentar el rango a F para incluir las observaciones
-            valueInputOption: 'USER_ENTERED',
-            resource: { values: [newRow] },
+            range: 'A1:G1',  // Asegúrate de que esta fila tenga espacio para el nuevo campo
+            valueInputOption: 'RAW',
+            insertDataOption: 'INSERT_ROWS',
+            resource: {
+                values: [rowData],
+            },
         });
 
-        res.status(200).json({ message: 'Reserva registrada exitosamente en el calendario y la hoja de cálculo.' });
+        res.status(200).json({ message: 'Reserva registrada correctamente.' });
     } catch (error) {
-        console.error('Error al registrar reserva:', error);
+        console.error('Error al registrar la reserva:', error);
         res.status(500).json({ error: 'Error al registrar la reserva.' });
     }
 });
+
+
 
 
 
