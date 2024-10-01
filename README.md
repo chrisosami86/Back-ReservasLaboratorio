@@ -25,4 +25,4 @@
 
 **6.** Después de configurar todo, en el Frond, cambiar las rutas de peticiones a local
 
-**7.** Node server.js en la terminal
+**7.** ```node server.js``` en la terminal
