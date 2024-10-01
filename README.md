@@ -21,7 +21,7 @@
 
 * **GOOGLE_CALENDAR_ID =** El ID del calendario donde queremos los eventos (Sin comillas)
 
-* **GOOGLE_CREDENTIALS =** 'Todo el contenido del archivo de credenciales .JSON de Google' (Dentro de las comillas)
+* **GOOGLE_CREDENTIALS =** 'Todo el contenido del archivo de credenciales ```.JSON``` de Google' (Dentro de las comillas)
 
 **6.** Después de configurar todo, en el Frond, cambiar las rutas de peticiones a local
 
