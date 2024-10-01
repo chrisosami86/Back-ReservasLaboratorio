@@ -17,11 +17,11 @@
 
 **5.** Dentro del archivo ```.env``` debe tener las siguientes variables.
 
-* GOOGLE_SHEET_ID = El ID de la hoja de cálculo donde necesitamos los registros.
+* GOOGLE_SHEET_ID = El ID de la hoja de cálculo donde necesitamos los registros. (Sin comillas)
 
-* GOOGLE_CALENDAR_ID = El ID del calendario donde queremos los eventos
+* GOOGLE_CALENDAR_ID = El ID del calendario donde queremos los eventos (Sin comillas)
 
-* GOOGLE_CREDENTIALS = 'Todo el contenido del archivo de credenciales .JSON de Google'
+* GOOGLE_CREDENTIALS = 'Todo el contenido del archivo de credenciales .JSON de Google' (Dentro de las comillas)
 
 **6.** Después de configurar todo, en el Frond, cambiar las rutas de peticiones a local
 
