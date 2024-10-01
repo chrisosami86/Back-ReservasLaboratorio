@@ -112,7 +112,7 @@ app.post('/validate-intervals', async (req, res) => {
 // Endpoint para registrar un evento en el calendario y en la hoja de cálculo
 app.post('/register-reservation', async (req, res) => {
     try {
-        const { teacherName, subject, reservationDate, timeSlotId } = req.body;
+        const { teacherName, subject, reservationDate, timeSlotId, observations } = req.body; // Añadir observaciones
 
         // Obtener el intervalo de tiempo basado en el ID
         const selectedInterval = timeIntervals[timeSlotId];
@@ -147,11 +147,12 @@ app.post('/register-reservation', async (req, res) => {
             subject,
             reservationDate,
             `${selectedInterval.start} - ${selectedInterval.end}`,
+            observations, // Añadir observaciones
         ];
 
         await sheets.spreadsheets.values.append({
             spreadsheetId: sheetId,
-            range: 'A:E',
+            range: 'A:F', // Aumentar el rango a F para incluir las observaciones
             valueInputOption: 'USER_ENTERED',
             resource: { values: [newRow] },
         });
@@ -162,6 +163,8 @@ app.post('/register-reservation', async (req, res) => {
         res.status(500).json({ error: 'Error al registrar la reserva.' });
     }
 });
+
+
 
 // Inicializar el servidor en el puerto 3000
 const PORT = process.env.PORT || 3000;
