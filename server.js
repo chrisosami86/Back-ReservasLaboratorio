@@ -54,8 +54,9 @@ app.post('/validate-intervals', async (req, res) => {
     try {
         const { selectedDate } = req.body;
 
-        const startOfDay = new Date(`${selectedDate}T00:00:00Z`).toISOString();
-        const endOfDay = new Date(`${selectedDate}T23:59:59Z`).toISOString();
+        // Convertir la fecha seleccionada al inicio y fin del día en la zona horaria de Bogotá (UTC-5)
+        const startOfDay = new Date(`${selectedDate}T00:00:00-05:00`).toISOString();
+        const endOfDay = new Date(`${selectedDate}T23:59:59-05:00`).toISOString();
 
         // Buscar eventos del día en el calendario
         const events = await calendar.events.list({
@@ -75,9 +76,9 @@ app.post('/validate-intervals', async (req, res) => {
 
             // Verificar superposición con cada intervalo
             Object.values(timeIntervals).forEach((interval) => {
-                // Crear objetos Date para los intervalos del día seleccionado
-                const intervalStart = new Date(`${selectedDate}T${interval.start}:00`);
-                const intervalEnd = new Date(`${selectedDate}T${interval.end}:00`);
+                // Crear objetos Date para los intervalos del día seleccionado (en UTC-5)
+                const intervalStart = new Date(`${selectedDate}T${interval.start}:00-05:00`);
+                const intervalEnd = new Date(`${selectedDate}T${interval.end}:00-05:00`);
 
                 // Verificar superposición (eventStart < intervalEnd && eventEnd > intervalStart)
                 if (
@@ -93,12 +94,12 @@ app.post('/validate-intervals', async (req, res) => {
 
         // Filtrar los intervalos disponibles y añadir ID
         const availableIntervals = Object.entries(timeIntervals).filter(([id, interval]) => {
-            const intervalStart = new Date(`${selectedDate}T${interval.start}:00`);
-            const intervalEnd = new Date(`${selectedDate}T${interval.end}:00`);
+            const intervalStart = new Date(`${selectedDate}T${interval.start}:00-05:00`);
+            const intervalEnd = new Date(`${selectedDate}T${interval.end}:00-05:00`);
 
             return !uniqueOccupiedIntervals.some(occupied => 
-                intervalStart.getTime() === new Date(`${selectedDate}T${occupied.start}:00`).getTime() &&
-                intervalEnd.getTime() === new Date(`${selectedDate}T${occupied.end}:00`).getTime()
+                intervalStart.getTime() === new Date(`${selectedDate}T${occupied.start}:00-05:00`).getTime() &&
+                intervalEnd.getTime() === new Date(`${selectedDate}T${occupied.end}:00-05:00`).getTime()
             );
         }).map(([id, interval]) => ({ id, ...interval })); // Añadir ID a cada intervalo
 
@@ -108,6 +109,7 @@ app.post('/validate-intervals', async (req, res) => {
         res.status(500).json({ error: 'Error al validar intervalos.' });
     }
 });
+
 
 
 
