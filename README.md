@@ -1,4 +1,4 @@
-# Formulario de registro de alimentación
+# Formulario de registro de alimentación (Backend)
 
 * Esta es una aplicación que permite registrar las reservas en un Google calendar
 * También registra las reservas en una hoja de Google Sheet
